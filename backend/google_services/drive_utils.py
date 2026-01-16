@@ -293,6 +293,117 @@ def share_file(file_id: str, email: str, role: str = 'reader', user_email: str =
         return {"success": False, "message": f"Failed to share file: {e}"}
 
 
+def create_folder(folder_name: str, parent_folder_id: str = None, user_email: str = None):
+    """
+    Creates a new folder in Google Drive.
+
+    :param folder_name: Name of the folder to create.
+    :param parent_folder_id: Parent folder ID (optional, defaults to root).
+    :param user_email: Email of the user (for token retrieval).
+    """
+    service, error = get_google_service("drive", "v3", user_email)
+    if error:
+        return {"success": False, "message": error}
+
+    try:
+        folder_metadata = {
+            'name': folder_name,
+            'mimeType': 'application/vnd.google-apps.folder'
+        }
+        if parent_folder_id:
+            folder_metadata['parents'] = [parent_folder_id]
+
+        folder = service.files().create(body=folder_metadata, fields='id, name, webViewLink').execute()
+
+        return {
+            "success": True,
+            "message": f"Folder '{folder_name}' created successfully.",
+            "details": {
+                "folder_id": folder.get('id'),
+                "folder_name": folder.get('name'),
+                "folder_link": folder.get('webViewLink')
+            }
+        }
+    except Exception as e:
+        return {"success": False, "message": f"Failed to create folder: {e}"}
+
+
+def read_file(file_id: str, user_email: str = None):
+    """
+    Reads metadata and content info for a file in Google Drive.
+
+    :param file_id: ID of the file to read.
+    :param user_email: Email of the user (for token retrieval).
+    """
+    service, error = get_google_service("drive", "v3", user_email)
+    if error:
+        return {"success": False, "message": error}
+
+    try:
+        file = service.files().get(
+            fileId=file_id,
+            fields='id, name, webViewLink, mimeType, size, createdTime, modifiedTime, owners'
+        ).execute()
+
+        return {
+            "success": True,
+            "message": f"File '{file.get('name')}' retrieved successfully.",
+            "details": {
+                "file_id": file.get('id'),
+                "file_name": file.get('name'),
+                "file_link": file.get('webViewLink'),
+                "mime_type": file.get('mimeType'),
+                "size": file.get('size'),
+                "created": file.get('createdTime'),
+                "modified": file.get('modifiedTime')
+            }
+        }
+    except Exception as e:
+        return {"success": False, "message": f"Failed to read file: {e}"}
+
+
+def update_file(file_id: str, new_name: str = None, new_description: str = None, user_email: str = None):
+    """
+    Updates a file's metadata (name, description).
+
+    :param file_id: ID of the file to update.
+    :param new_name: New name for the file (optional).
+    :param new_description: New description (optional).
+    :param user_email: Email of the user (for token retrieval).
+    """
+    service, error = get_google_service("drive", "v3", user_email)
+    if error:
+        return {"success": False, "message": error}
+
+    try:
+        file_metadata = {}
+        if new_name:
+            file_metadata['name'] = new_name
+        if new_description is not None:
+            file_metadata['description'] = new_description
+
+        if not file_metadata:
+            return {"success": False, "message": "No updates provided"}
+
+        updated_file = service.files().update(
+            fileId=file_id,
+            body=file_metadata,
+            fields='id, name, webViewLink'
+        ).execute()
+
+        return {
+            "success": True,
+            "message": f"File updated successfully.",
+            "details": {
+                "file_id": updated_file.get('id'),
+                "file_name": updated_file.get('name'),
+                "file_link": updated_file.get('webViewLink')
+            }
+        }
+    except Exception as e:
+        return {"success": False, "message": f"Failed to update file: {e}"}
+
+
 def list_files_in_folder(folder_name: str, user_email: str = None):
     """
     Lists files inside a specific folder by searching for the folder name.

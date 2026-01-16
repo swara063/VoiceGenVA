@@ -71,6 +71,24 @@ def create_message(to, subject, body, cc=None, bcc=None):
     return {"raw": raw_message}
 
 
+def delete_email(message_id: str, user_email=None):
+    """
+    Deletes an email message permanently.
+
+    :param message_id: ID of the email to delete
+    :param user_email: Email of the user (for token retrieval)
+    """
+    service, error = get_google_service("gmail", "v1", user_email)
+    if error:
+        return {"success": False, "message": error}
+
+    try:
+        service.users().messages().delete(userId='me', id=message_id).execute()
+        return {"success": True, "message": "Email deleted successfully"}
+    except Exception as e:
+        return {"success": False, "message": f"Failed to delete email: {e}"}
+
+
 def send_draft_email(to: str, subject: str, body: str, cc: str = None, bcc: str = None, user_email=None, approved: bool = False):
     """
     Creates and sends an email using Gmail API with optional CC and BCC.

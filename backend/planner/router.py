@@ -189,7 +189,7 @@ SMALL_TALK (only for greetings/casual chat):
 
 STRICT RULES (NEVER BREAK THESE):
 1. **CRITICAL EMAIL RULE**: ANY email/send/mail/compose/draft request MUST ALWAYS use GMAIL_COMPOSE action. NEVER use SMALL_TALK for emails.
-2. For emails: If user mentions name without email, use "name@placeholder.com" for to field
+2. For emails: ALWAYS resolve contact names to real emails. If user says "Jubi", extract their real email from contacts. NEVER use placeholders unless contact absolutely not found.
 3. For emails: Always generate complete subject and body, even if user only provides partial info
 4. For calendar: Parse dates like "tomorrow", "next Monday" to ISO format
 5. For calendar: "instant meeting" or "meeting now" sets instant: true
@@ -315,6 +315,26 @@ def run_planner(user_input: str, user_email: str = None) -> dict:
             plan = json.loads(response_text)
             print(f"✅ LLM returned valid JSON: {plan}")
             print(f"✅ Action detected: {plan.get('action')}")
+
+            # RESOLVE RECIPIENTS FOR EMAIL COMPOSE
+            if plan.get('action') == 'GMAIL_COMPOSE':
+                from utils.recipient_resolver import resolve_recipients
+
+                # Process TO field
+                to_list = plan.get('to', [])
+                resolved_to = []
+                for recipient_name in to_list:
+                    if '@' in recipient_name and '.' in recipient_name:
+                        resolved_to.append(recipient_name)
+                    else:
+                        resolver_result = resolve_recipients(recipient_name, user_email)
+                        if resolver_result.get('emails'):
+                            resolved_to.extend(resolver_result['emails'])
+                        else:
+                            resolved_to.append(f"{recipient_name.lower().replace(' ', '')}@placeholder.com")
+
+                plan['to'] = resolved_to
+                print(f"✅ Resolved TO: {resolved_to}")
 
             return plan
 

@@ -69,8 +69,9 @@ def get_upcoming_events(max_results: int = 10, user_email: str = None):
         return {"success": False, "message": error}
 
     try:
-        import datetime
-        now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+        import datetime as dt
+        ist_tz = pytz.timezone('Asia/Kolkata')
+        now = dt.datetime.now(ist_tz).isoformat()  # Use IST instead of UTC
 
         events_result = service.events().list(
             calendarId='primary',
@@ -202,8 +203,9 @@ def get_event_meet_link(event_id: str = None, summary_search: str = None, user_e
 
         elif summary_search:
             # Search for event by title
-            import datetime
-            now = datetime.datetime.utcnow().isoformat() + 'Z'
+            import datetime as dt
+            ist_tz = pytz.timezone('Asia/Kolkata')
+            now = dt.datetime.now(ist_tz).isoformat()
 
             events_result = service.events().list(
                 calendarId='primary',
@@ -263,7 +265,8 @@ def update_calendar_event(event_id: str = None, summary_search: str = None, new_
     try:
         # Find event if only summary_search is provided
         if not event_id and summary_search:
-            now = datetime.now().isoformat() + 'Z'
+            ist_tz = pytz.timezone('Asia/Kolkata')
+            now = datetime.now(ist_tz).isoformat()
 
             events_result = service.events().list(
                 calendarId='primary',
@@ -352,7 +355,8 @@ def delete_calendar_event(event_id: str = None, summary: str = None, user_email:
     try:
         # If no event_id, search by summary
         if not event_id and summary:
-            now = datetime.now().isoformat() + 'Z'
+            ist_tz = pytz.timezone('Asia/Kolkata')
+            now = datetime.now(ist_tz).isoformat()
 
             events_result = service.events().list(
                 calendarId='primary',

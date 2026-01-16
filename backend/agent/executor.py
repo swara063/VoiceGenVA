@@ -1,7 +1,7 @@
 # backend/agent/executor.py
-from google_services.gmail_utils import send_draft_email, search_inbox, read_email, list_unread_emails, download_attachment
+from google_services.gmail_utils import send_draft_email, search_inbox, read_email, list_unread_emails, download_attachment, delete_email
 from google_services.calendar_utils import create_calendar_event, get_upcoming_events, create_instant_meet, delete_calendar_event, update_calendar_event
-from google_services.drive_utils import search_drive_files
+from google_services.drive_utils import search_drive_files, create_folder, read_file, update_file
 from google_services.contacts_utils import search_contacts
 from logs.log_utils import log_execution
 from planner.router import call_llm_for_small_talk
@@ -210,6 +210,37 @@ def execute_action(action: str, params: dict, user_email: str):
             user_email=user_email
         )
         action_name = "Text Appended to Document"
+
+    elif action == "GMAIL_DELETE":
+        result = delete_email(
+            message_id=params.get('message_id'),
+            user_email=user_email
+        )
+        action_name = "Email Deleted"
+
+    elif action == "DRIVE_CREATE_FOLDER":
+        result = create_folder(
+            folder_name=params.get('folder_name'),
+            parent_folder_id=params.get('parent_folder_id'),
+            user_email=user_email
+        )
+        action_name = "Folder Created"
+
+    elif action == "DRIVE_READ_FILE":
+        result = read_file(
+            file_id=params.get('file_id'),
+            user_email=user_email
+        )
+        action_name = "File Read"
+
+    elif action == "DRIVE_UPDATE_FILE":
+        result = update_file(
+            file_id=params.get('file_id'),
+            new_name=params.get('new_name'),
+            new_description=params.get('new_description'),
+            user_email=user_email
+        )
+        action_name = "File Updated"
 
     else:
         result = {"success": False, "message": f"Unknown action: {action}"}
