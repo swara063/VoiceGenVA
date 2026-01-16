@@ -1,7 +1,5 @@
 # VoiceGenVA
 
-**Status:** FULLY FUNCTIONAL AND DEMO-READY  
-
 VoiceGenVA is a voice-controlled AI assistant for Google Workspace, designed to automate productivity tasks using natural language. It leverages modern LLM-driven architecture to provide a seamless, secure, and hands-free experience.
 
 ## I. Key Features and Supported Services
