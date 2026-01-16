@@ -15,18 +15,6 @@ VoiceGenVA integrates across eight core Google Workspace services, enabling voic
 - **Natural Language Support:** Handles complex queries, date parsing (e.g., "tomorrow at 2 PM"), and contact resolution.
 - **Voice Integration:** Full Speech-to-Text input and Text-to-Speech output with toggle support.
 
-### Supported Google Workspace Services
-| Service   | Primary Actions                                 | Status      |
-|----------|-------------------------------------------------|------------|
-| Gmail     | Send Email, Search Inbox, List Unread, Read Email | ✅ High    |
-| Calendar  | Create Event, Instant Meet, List/Update/Delete Event | ✅ High |
-| Tasks     | Create, List, Complete, Delete Tasks           | ✅ High    |
-| Docs      | Create Document, Append Content, Search (via Drive) | ⚠️ Partial |
-| Sheets    | Create Spreadsheet, Add Row, Read Data         | ⚠️ Partial |
-| Drive     | Search Files (owned and shared)                | ⚠️ Partial |
-| Contacts  | Search, List, Create Contact                   | ✅ High    |
-| Keep      | Create, List, Edit Note (via Docs workaround)  | ⚠️ Workaround |
-
 ## II. System Architecture
 
 VoiceGenVA follows a modular architecture for maintainability and scalability.
